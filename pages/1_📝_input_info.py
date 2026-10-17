@@ -204,7 +204,7 @@ def save_profile(profile, output_dir):
 
 
 def parse_info(user_text):
-    baseline = PROFILE_DIR / "baseline.json"
+    baseline = WORKING_DIR / "baseline.json"
     try:
         with baseline.open("r", encoding="utf-8") as file:
             baseline = json.load(file)
