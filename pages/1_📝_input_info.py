@@ -193,7 +193,7 @@ def safe_filename(name: str) -> str:
 
 def save_profile(profile, output_dir):
     output_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     destination = output_dir / f"{safe_filename(profile.name)}_{timestamp}.json"
     
     # Exclusive creation avoids silently overwriting an existing file.
