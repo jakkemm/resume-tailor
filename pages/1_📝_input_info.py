@@ -62,46 +62,15 @@ class Profile(StrictModel):
     contact: Contact
     experience: list[Experience]
     education: list[Education]
+    misc: list[str]
 
     @model_validator(mode="after")
     def require_some_information(self) -> Profile:
         has_contact = any([self.contact.location, self.contact.email, self.contact.linkedin, self.contact.github])
         
-        if not any([self.name, has_contact, self.experience, self.education]):
+        if not any([self.name, has_contact, self.experience, self.education, self.misc]):
             raise ValueError("the model returned an entirely empty profile")
         return self
-
-
-def expected_template() -> dict[str, Any]:
-    """Return one representative object for each record type in the baseline."""
-    return {
-        "name": "",
-        "contact": {
-            "location": "",
-            "email": "",
-            "linkedin": "",
-            "github": "",
-        },
-        "experience": [
-            {
-                "company": "",
-                "role": "",
-                "dates": "",
-                "facts": [],
-                "technologies": [],
-            }
-        ],
-        "education": [
-            {
-                "degree": "",
-                "institution": "",
-                "dates": "",
-                "thesis": "",
-                "facts": [],
-                "technologies": [],
-            }
-        ],
-    }
 
 
 def check_output_matches_baseline(data, baseline, path="$"):
@@ -149,6 +118,9 @@ Rules:
 - Put concise factual statements in facts, and technologies/tools in technologies.
 - Do not include empty placeholder experience or education entries.
 - Return every key in the requested schema and no extra keys.
+- If there exists useful info about a candidate, that doesn't qualify as contact info,
+  experience info or education info, but nevertheless is a useful info, put it into
+  `misc` category.
 
 The baseline JSON below illustrates the required structure. Its blank fields are
 placeholders, not facts to copy into the result:
