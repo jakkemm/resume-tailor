@@ -4,8 +4,13 @@ from pathlib import Path
 
 import streamlit as st
 
+from src.job_parser import extract_job_description
+from src.tailor import build_tailored_pdf_schema
+from src.pdf_parser import pdf_parser
+
 WORKING_DIR = Path(__file__).resolve().parent
 PROFILE_DIR = WORKING_DIR / "profiles"
+DEFAULT_MODEL = "qwen2.5:3b"
 
 st.set_page_config(
     page_title="Resume Builder",
@@ -34,11 +39,29 @@ def list_profiles():
     
     return profiles
 
-
 def load_profile(file):
     with file.open("r", encoding="utf-8") as f:
         profile = json.load(f)
     return profile
+
+def get_job_desc():
+    desc_type = st.radio(
+        "Choose job offer input",
+        ["Description", "URL"]
+    )
+    
+    if desc_type == "Description":
+        desc = st.text_area("Input job description")
+    elif desc_type == "URL":
+        url = st.text_input("Input url")
+        desc = ""
+        
+        if st.button("Fetch description"):
+            try:
+                desc = extract_job_description(url)
+            except Exception as exc:
+                st.error(f"Error trying to fetch job description: \n{exc}")
+        return desc
 
 
 st.title("Resume Builder")
@@ -47,5 +70,14 @@ st.text("To build a resume, you need to create your profile. If you haven't done
 
 all_profiles_dict = list_profiles()
 selected_profile = st.selectbox("Choose your profile", list(all_profiles_dict.keys()))
-profile = load_profile(all_profiles_dict[selected_profile])
-st.json(profile)
+
+if selected_profile is not None:
+    profile_file = all_profiles_dict[selected_profile]
+    profile = load_profile(profile_file)
+    st.json(profile, expanded=False)
+    
+    job_desc = get_job_desc()
+    resume = build_tailored_pdf_schema(profile, job_desc, DEFAULT_MODEL)
+    file = pdf_parser(resume, profile_file.name)
+    
+    st.pdf(file)

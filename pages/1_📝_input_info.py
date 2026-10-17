@@ -6,11 +6,12 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import streamlit as st
 from ollama import chat
 from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
+
+from prompts import build_input_prompt
 
 WORKING_DIR = Path(__file__).resolve().parent.parent
 PROFILE_DIR = WORKING_DIR / "profile"
@@ -103,37 +104,7 @@ def check_output_matches_baseline(data, baseline, path="$"):
 
 def parse_profile(user_text, baseline, model) -> Profile:
     schema = Profile.model_json_schema()
-    prompt = f"""
-Extract a structured career profile from the candidate's text.
-
-Rules:
-- Use only information explicitly stated in the candidate's text.
-- Do not invent or infer employers, job titles, dates, achievements, metrics,
-  degrees, institutions, thesis titles, technologies, email addresses or URLs.
-- Preserve factual meaning. You may fix obvious grammar and organize details,
-  but do not exaggerate responsibilities or outcomes.
-- If a field is not supplied, use an empty string or an empty list as appropriate.
-- Create one experience entry per distinct role/employment entry that is clearly
-  described. Create one education entry per clearly described degree/program.
-- Put concise factual statements in facts, and technologies/tools in technologies.
-- Do not include empty placeholder experience or education entries.
-- Return every key in the requested schema and no extra keys.
-- If there exists useful info about a candidate, that doesn't qualify as contact info,
-  experience info or education info, but nevertheless is a useful info, put it into
-  `misc` category.
-
-The baseline JSON below illustrates the required structure. Its blank fields are
-placeholders, not facts to copy into the result:
-{json.dumps(baseline, ensure_ascii=False, indent=2)}
-
-The JSON schema is:
-{json.dumps(schema, ensure_ascii=False)}
-
-Candidate information:
---- BEGIN CANDIDATE INFORMATION ---
-{user_text}
---- END CANDIDATE INFORMATION ---
-""".strip()
+    prompt = build_input_prompt(user_text, baseline, model)
 
     response = chat(
         model=model,
