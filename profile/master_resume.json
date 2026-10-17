@@ -1,0 +1,28 @@
+{
+    "name": "",
+    "contact": {
+        "location": "",
+        "email": "",
+        "linkedin": "",
+        "github": ""
+    },
+    "experience": [
+        {
+        "company": "",
+        "role": "",
+        "dates": "",
+        "facts": [],
+        "technologies": []
+        }
+    ],
+    "education": [
+        {
+            "degree": "",
+            "institution": "",
+            "dates": "",
+            "thesis": "",
+            "facts": [],
+            "technologies": []
+        }
+    ]
+}
