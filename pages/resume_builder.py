@@ -8,7 +8,7 @@ from src.job_parser import extract_job_description
 from src.pdf_parser import pdf_parser
 from src.tailor import build_tailored_pdf_schema
 
-WORKING_DIR = Path(__file__).resolve().parent
+WORKING_DIR = Path(__file__).resolve().parent.parent
 PROFILE_DIR = WORKING_DIR / "profiles"
 DEFAULT_MODEL = "qwen2.5:3b"
 
