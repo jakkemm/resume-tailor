@@ -1,5 +1,3 @@
-"""Parse free-form career information into a validated profile JSON using local Ollama."""
-
 from __future__ import annotations
 
 import json
@@ -11,10 +9,10 @@ import streamlit as st
 from ollama import chat
 from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
-from prompts import build_input_prompt
+from src.prompts import build_input_prompt
 
 WORKING_DIR = Path(__file__).resolve().parent.parent
-PROFILE_DIR = WORKING_DIR / "profile"
+PROFILE_DIR = WORKING_DIR / "profiles"
 DEFAULT_MODEL = "qwen2.5:3b"
 
 
@@ -152,8 +150,8 @@ def parse_info(user_text):
         with baseline.open("r", encoding="utf-8") as file:
             baseline = json.load(file)
 
-        st.markdown("Parsing with local model. This may take a moment...")
-        profile = parse_profile(user_text, baseline, DEFAULT_MODEL)
+        with st.spinner("Parsing career information with Ollama..."):
+            profile = parse_profile(user_text, baseline, DEFAULT_MODEL)
         return profile
 
     except FileNotFoundError as exc:
@@ -170,7 +168,6 @@ def parse_info(user_text):
     return None
 
 
-Profile.model_rebuild()
 
 if "profile" not in st.session_state:
     st.session_state.profile = None
