@@ -1,5 +1,7 @@
 
-# TODO
+# WORK IN PROGRESS
+
+**TODO:**
 
 - Carlito font
 - pdf filename
